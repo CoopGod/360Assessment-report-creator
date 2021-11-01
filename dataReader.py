@@ -25,7 +25,7 @@ def main():
     revieweesList = reviewees()
     for review in revieweesList:
         assessments = dataParse(review)
-        df = createDataframe(assessments)
+        df = createDataFrame(assessments)
         plotData(df, review)
 
 
@@ -91,9 +91,9 @@ def dataParse(reviewee):
     return assessments
 
 
-# function to create dataframe regarding person of focus
-def createDataframe(assessments):
-    # init all columns in dataframe
+# function to create data frame regarding person of focus
+def createDataFrame(assessments):
+    # init all columns in data frame
     df = pd.DataFrame(columns=['1.','2.','3.','4.','5.','6.','7.','8.','9.','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38'])
     # Log all Skill Ratings!
     skillReviewNum = 0
@@ -102,7 +102,7 @@ def createDataframe(assessments):
         skillValues = {}
         for skills in review.skillList:
             for skill in skills:
-                # move through each skill and append it to the corresponding dataframe column
+                # move through each skill and append it to the corresponding data frame column
                 data = int(skill[3:])
                 header = str(skill[:2])
                 skillValues[header] = data
@@ -117,7 +117,7 @@ def createDataframe(assessments):
     for review in assessments:
         impValues = {}
         for imps in review.importanceList:
-            # move through each importance rating and append it to the corresponding dataframe column
+            # move through each importance rating and append it to the corresponding data frame column
             data = int(imps[3:])
             header = str(imps[:2])
             impValues[header] = data
@@ -130,7 +130,7 @@ def createDataframe(assessments):
     return df
         
 
-# function to upload/display graphs using dataframe
+# function to upload/display graphs using data frame
 def plotData(df, reviewee):
     # get different colors 
     cmap = []
