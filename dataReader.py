@@ -3,7 +3,9 @@ import sys
 import pandas as pd
 from io import BytesIO
 import matplotlib.pyplot as plt
+from matplotlib import transforms
 import numpy as np
+from PIL import Image, ImageDraw
 import docx
 from docx.shared import Inches
 
@@ -109,7 +111,7 @@ def createDataFrame(assessments):
         # add all review data to df
         df = df.append(skillValues, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
-        axisRelations[skillReviewNum] = review.focusRelation + "-Skill"
+        axisRelations[skillReviewNum] = review.focusRelation + "-SKL"
         skillReviewNum += 1
 
     # log all Importance Ratings!
@@ -124,7 +126,7 @@ def createDataFrame(assessments):
         # add all review data to df
         df = df.append(impValues, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
-        axisRelations[impReviewNum + skillReviewNum] = review.focusRelation + "-Importance"
+        axisRelations[impReviewNum + skillReviewNum] = review.focusRelation + "-IMP"
         impReviewNum += 1
     df = df.rename(index=axisRelations) 
     return df
@@ -138,9 +140,9 @@ def plotData(df, reviewee):
     bars = len(df.index)
     for num in range(bars):
         if num < barsHalf:
-            cmap.append('#f7c275')
+            cmap.append('#b8eff6')
         else:
-            cmap.append('#75aaf7')
+            cmap.append('#e81a00')
     # save file in report
     # document setup
     document = docx.Document()
@@ -162,6 +164,7 @@ def plotData(df, reviewee):
         # pretty graphs <3
         ax.set_ylim(ymax=5.25)
         ax.get_legend().remove()
+        plt.xticks(rotation = 75)
         # add image
         plt.savefig(memfile, bbox_inches='tight')
         document.add_picture(memfile, width=Inches(3))
