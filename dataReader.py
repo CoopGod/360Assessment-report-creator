@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 from io import BytesIO
 import matplotlib.pyplot as plt
+from PIL import Image
 import numpy as np
 import docx
 from docx.shared import Inches
@@ -157,19 +158,24 @@ def plotData(df, reviewee):
     # create plot and add image of it to docx
     for i in range(1, len(df.columns) + 1):
         iteration = str(i) + "." # to skirt the "." issue with 1-9
-        memfile = BytesIO()
         ax = df.plot.bar(y=iteration[:2], color=cmap) # fuck ya
         # pretty graphs <3
         ax.set_ylim(ymax=5.25)
         ax.get_legend().remove()
-        plt.xticks(rotation = 75)
+        plt.yticks(rotation= 90)
         # add image
-        plt.savefig(memfile, bbox_inches='tight')
-        document.add_picture(memfile, width=Inches(3))
+        plt.savefig('temp.jpg', bbox_inches='tight')
+        imageFile = Image.open('temp.jpg')
+        # add whitespace to image so rotating isn't wonky
+        background = Image.new("RGB", (550, 550), (255,255,255))
+        background.paste(imageFile)
+        background = background.rotate(270)
+        background.save('temp.jpg')
+        document.add_picture('temp.jpg', width=Inches(3))
         # add question info/text to document
         paragraph = document.add_paragraph(headers[3+(i*2)])
         # save that sweet, sweet memory
-        memfile.close()
+        imageFile.close()
         plt.close()
     # save file under person of focus' name
     document.save(f'{reviewee}-report.docx')
