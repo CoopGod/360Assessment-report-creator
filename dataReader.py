@@ -3,9 +3,7 @@ import sys
 import pandas as pd
 from io import BytesIO
 import matplotlib.pyplot as plt
-from matplotlib import transforms
 import numpy as np
-from PIL import Image, ImageDraw
 import docx
 from docx.shared import Inches
 
