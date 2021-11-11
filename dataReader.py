@@ -1,6 +1,7 @@
 import csv
 import sys
 import pandas as pd
+import random
 from io import BytesIO
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -60,12 +61,12 @@ def dataParse(reviewee):
             if row[3] == reviewee or rowCount == 0:
                 # if not header move through and assign based on documentation
                 if rowCount != 0:
-                    # priliminary setup (should be changed later for sake of variability)
+                    # priliminary setup
                     name = row[1]
                     focus = row[3]
-                    # change relation name to described documentation (input by customer)
-                    employeeCount += 1
+                    # change relation name to described documentation
                     if row[4] == "Peer" or row[4] == "Employee":
+                        employeeCount += 1
                         relation = f"Employee {employeeCount}"
                     else:
                         relation = row[4]
@@ -127,21 +128,34 @@ def createDataFrame(assessments):
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
         axisRelations[impReviewNum + skillReviewNum] = review.focusRelation + "-IMP"
         impReviewNum += 1
-    df = df.rename(index=axisRelations) 
+    # rename and sort alphebetically
+    df = df.rename(index=axisRelations)
+    df = df.sort_index(ascending=False)
+
+    # create legend for all graphs
+    try:
+        document = docx.Document('legend.docx')
+    except:
+        document = docx.Document()
+    document.add_heading(f'{review.focusName}',0)
+    for review in assessments:
+        document.add_paragraph(f"{review.reviewName}: {review.focusRelation}")
+    document.save('legend.docx')
+    
     return df
         
 
 # function to upload/display graphs using data frame
 def plotData(df, reviewee):
-    # get different colors 
+    # get different colors
+    colorDictionary = {0: '#fc0403',2: '#008000',4: '#0000FF',6: '#FF7F50',8: '#FFFACD',10: '#FF69B4', 12: '#800080'}
     cmap = []
-    barsHalf = len(df.index) / 2
     bars = len(df.index)
     for num in range(bars):
-        if num < barsHalf:
-            cmap.append('#b8eff6')
+        if num % 2 != 0:
+            cmap.append(cmap[num - 1])
         else:
-            cmap.append('#e81a00')
+            cmap.append(colorDictionary[num])
     # save file in report
     # document setup
     document = docx.Document()
