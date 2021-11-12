@@ -7,3 +7,7 @@ The *main* function then strings together the pieces of this puzzle to create a 
 This is done by parsing through the raw CSV data and turning it into a more useful form via both the *Review* class and the *dataParse* function. 
 This refined information is then simply put into a data frame in the *createDataFrame* function. 
 The data frame is then utilized by the *plotData* function, to both plot the data on a graph using **Pandas** and **MatPlotLib**. Then it is added, along with relating text, to a report (.docx) to be shipped off to its recipient by HR.
+### Example Graph
+![temp](https://user-images.githubusercontent.com/57197353/141396685-33279d9a-a76d-4720-9b47-c6892ee5219b.jpg)
+
+for full reports, please check out the 'exmaple reports' folder! It contains reports for Individuals and a coresponding legend, as well as an overall graph that combines all answers based on role!
