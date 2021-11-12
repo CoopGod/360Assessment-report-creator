@@ -79,10 +79,10 @@ def dataParse(reviewee):
                     for item in row:
                         currentHeader = headerList[itemCount]
                         if currentHeader[:1].isdigit():
-                            skills.append(f"{currentHeader[:2]}:{item}") # 1-9 remove . later
+                            skills.append(f"{currentHeader[:2]}:{item}")
                             previousHeader = currentHeader
                         elif currentHeader[:2] == "Op":
-                            importance.append(f"{previousHeader[:2]}:{item}") # 1-9 remove . later
+                            importance.append(f"{previousHeader[:2]}:{item}")
                         itemCount += 1
                     # create Review object for later use
                     assessments.append(Review(focus, relation, name, skills, importance))
@@ -148,7 +148,7 @@ def createDataFrame(assessments):
 # function to upload/display graphs using data frame
 def plotData(df, reviewee):
     # get different colors
-    colorDictionary = {0: '#fc0403',2: '#008000',4: '#0000FF',6: '#FF7F50',8: '#FFFACD',10: '#FF69B4', 12: '#800080'}
+    colorDictionary = {0: '#ED6560',2: '#7BD7A8',4: '#F7A1C5',6: '#3952C6',8: '#a100ff',10: '#4522EA', 12: '#8E89C2', 14: '#8AE98B'}
     cmap = []
     bars = len(df.index)
     for num in range(bars):
