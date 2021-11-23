@@ -12,4 +12,4 @@ The **dataAverager.py** has a very similar structure, however it combines all re
 ### Example Graph
 ![temp](https://user-images.githubusercontent.com/57197353/141396685-33279d9a-a76d-4720-9b47-c6892ee5219b.jpg)
 
-for full reports, please check out the 'exmaple reports' folder! It contains reports for Individuals and a coresponding legend, as well as an overall graph that combines all answers based on role!
+for full reports, please check out the 'example reports' folder! It contains reports for Individuals and a coresponding legend, as well as an overall graph that combines all answers based on role!
