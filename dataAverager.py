@@ -1,5 +1,6 @@
 import csv
 import sys
+from typing import Counter
 import pandas as pd
 import random
 from io import BytesIO
@@ -36,14 +37,16 @@ def dataParse():
     with open(scheduleArg, "r", encoding="utf8") as schedule:
         reader = csv.reader(schedule)
         # Move through rows including header
+        headerList = []
         rowCount = 0
         employeeRows = []
         employeeCount = 0
         selfCount = 0
         selfRows = []
-        headerList = []
-        supervisorCount = 0
-        supervisorList = []
+        leaderCount = 0
+        leaderList = []
+        boardCount = 0
+        boardList = []
         for row in reader:
                 # if not header move through and assign based on documentation
                 if rowCount != 0:
@@ -51,7 +54,7 @@ def dataParse():
                     name = row[1]
                     focus = row[3]
                     # If employee, bring to different loop and average those scores
-                    if row[4] == "Peer" or row[4] == "Employee":
+                    if row[4] == "Employee":
                         employeeCount += 1
                         relation = "Employee"
                         employeeRows.append(rowCount)
@@ -59,9 +62,12 @@ def dataParse():
                     elif row[4] == "Self":
                         selfCount += 1
                         selfRows.append(rowCount)
+                    elif row[4] == "Leader":
+                        leaderCount += 1
+                        leaderList.append(rowCount)
                     else:
-                        supervisorCount += 1
-                        supervisorList.append(rowCount)
+                        boardCount += 1
+                        boardList.append(rowCount)
                     rowCount += 1
                 else:
                     headerList = row
@@ -158,16 +164,16 @@ def dataParse():
         assessments.append(Review(relation, skills, importance))
     schedule.close()
             
-    # parse through all supervisors and add their stats
+    # parse through all boards and add their stats
     with open(scheduleArg, "r", encoding="utf8") as schedule:
         reader = csv.reader(schedule)
         rowCount = 0
         skills = {}
         importance = {}
         for row in reader:
-            if rowCount in supervisorList:
+            if rowCount in boardList:
                 # change relation name to described documentation
-                relation = "Supervisor"
+                relation = "Board"
                 # if column is skill (based on number beginning the question) assign it to its list. If question starts
                 # with opera... then assign it to importance
                 itemCount = 0
@@ -194,10 +200,55 @@ def dataParse():
             rowCount += 1
         # use number of employees to create averages for each question
         for key, value in skills.items():
-            currentTotal = int(value) / supervisorCount
+            currentTotal = int(value) / boardCount
             skills[key] = currentTotal
         for key, value in importance.items():
-            currentTotal = int(value) / supervisorCount
+            currentTotal = int(value) / boardCount
+            importance[key] = currentTotal
+        # create Review object for later use 
+        assessments.append(Review(relation, skills, importance))
+    schedule.close()
+
+    # parse through all leaders and add their stats
+    with open(scheduleArg, "r", encoding="utf8") as schedule:
+        reader = csv.reader(schedule)
+        rowCount = 0
+        skills = {}
+        importance = {}
+        for row in reader:
+            if rowCount in leaderList:
+                # change relation name to described documentation
+                relation = "Leader"
+                # if column is skill (based on number beginning the question) assign it to its list. If question starts
+                # with opera... then assign it to importance
+                itemCount = 0
+                previousHeader = None
+                for item in row:
+                    currentHeader = headerList[itemCount]
+                    if currentHeader[:1].isdigit():
+                        try:
+                            currentTotal = int(skills[currentHeader[:2]])
+                            currentTotal += int(item)
+                            skills[currentHeader[:2]] = str(currentTotal)
+                        except:
+                            skills[currentHeader[:2]] = item
+                        previousHeader = currentHeader
+                    elif currentHeader[:2] == "Op":
+                        try:
+                            currentTotal = int(importance[previousHeader[:2]])
+                            currentTotal += int(item)
+                            importance[previousHeader[:2]] = str(currentTotal)
+                        except:
+                            importance[previousHeader[:2]] = item
+                        previousHeader = currentHeader
+                    itemCount += 1
+            rowCount += 1
+        # use number of employees to create averages for each question
+        for key, value in skills.items():
+            currentTotal = int(value) / leaderCount
+            skills[key] = currentTotal
+        for key, value in importance.items():
+            currentTotal = int(value) / leaderCount
             importance[key] = currentTotal
         # create Review object for later use 
         assessments.append(Review(relation, skills, importance))
@@ -272,17 +323,23 @@ def plotData(df):
         ax.set_ylim(ymax=5.25)
         ax.get_legend().remove()
         plt.yticks(rotation= 90)
+        plt.yticks([0,1,2,3,4,5], ['I', 'D', 'BA', 'C', 'VG', 'E'])
+        # add question info/text to document
+        paragraph = document.add_paragraph(headers[3+(i*2)])
         # add image
         plt.savefig('temp.jpg', bbox_inches='tight')
         imageFile = Image.open('temp.jpg')
+        # create table to imitate textbox
+        table = document.add_table(rows=1, cols=2)
+        row = table.rows[0].cells
+        row[1].text = "SKL:  IMP:"
         # add whitespace to image so rotating isn't wonky
         background = Image.new("RGB", (550, 550), (255,255,255))
         background.paste(imageFile)
         background = background.rotate(270)
         background.save('temp.jpg')
-        document.add_picture('temp.jpg', width=Inches(3))
-        # add question info/text to document
-        paragraph = document.add_paragraph(headers[3+(i*2)])
+        run = row[0].paragraphs[0].add_run()
+        run.add_picture('temp.jpg', width=Inches(3))
         # save that sweet, sweet memory
         imageFile.close()
         plt.close()
