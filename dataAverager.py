@@ -289,7 +289,7 @@ def createDataFrame(assessments):
     df = df.sort_index(ascending=False)
     df.plot.bar(y="1.")
     # add averages to separate document
-    df.to_csv('legend.csv', header=False)
+    df.to_csv('legend.csv', header=True)
     return df
 
 # function to plot dataframe data to report
