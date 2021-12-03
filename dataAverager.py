@@ -288,7 +288,8 @@ def createDataFrame(assessments):
     df = df.rename(index=axisRelations)
     df = df.sort_index(ascending=False)
     df.plot.bar(y="1.")
-    print(df)
+    # add averages to separate document
+    df.to_csv('legend.csv', header=False)
     return df
 
 # function to plot dataframe data to report
