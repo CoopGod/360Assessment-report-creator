@@ -148,7 +148,8 @@ def createDataFrame(assessments):
 # function to upload/display graphs using data frame
 def plotData(df, reviewee):
     # get different colors
-    colorDictionary = {0: '#ED6560',2: '#7BD7A8',4: '#F7A1C5',6: '#3952C6',8: '#a100ff',10: '#4522EA', 12: '#8E89C2', 14: '#8AE98B'}
+    colorDictionary = {0: '#E62421',2: '#344EE3',4: '#34B8E3',6: '#A1FF37',8: '#14CFFF',10: '#3634E3', 12: '#DF46FA', 14: '#E34234', 16: '#FB9F3A'
+    , 18: '#FAF6D1', 20: '#E6AF8C', 22: '#9AC3E6', 24: '#C4B5FA', 26: '#FADA82', 28: '#E6AFAC', 30: '#9EE6DA', 32: '#60E651', 34:'#FA72F7'} # TODO
     cmap = []
     bars = len(df.index)
     for num in range(bars):
@@ -177,6 +178,11 @@ def plotData(df, reviewee):
         ax.set_ylim(ymax=5.25)
         ax.get_legend().remove()
         plt.yticks(rotation= 90)
+        plt.yticks([0,1,2,3,4,5], ['I', 'D', 'BA', 'C', 'VG', 'E'])
+        # create table to imitate textbox + add question info/text to document
+        table = document.add_table(rows=1, cols=2)
+        row = table.rows[0].cells
+        row[1].text = headers[3+(i*2)]
         # add image
         plt.savefig('temp.jpg', bbox_inches='tight')
         imageFile = Image.open('temp.jpg')
@@ -185,9 +191,8 @@ def plotData(df, reviewee):
         background.paste(imageFile)
         background = background.rotate(270)
         background.save('temp.jpg')
-        document.add_picture('temp.jpg', width=Inches(3))
-        # add question info/text to document
-        paragraph = document.add_paragraph(headers[3+(i*2)])
+        run = row[0].paragraphs[0].add_run()
+        run.add_picture('temp.jpg', width=Inches(4))
         # save that sweet, sweet memory
         imageFile.close()
         plt.close()
