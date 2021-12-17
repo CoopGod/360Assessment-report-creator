@@ -208,52 +208,6 @@ def dataParse():
         # create Review object for later use 
         assessments.append(Review(relation, skills, importance))
     schedule.close()
-
-    # parse through all leaders and add their stats
-    with open(scheduleArg, "r", encoding="utf8") as schedule:
-        reader = csv.reader(schedule)
-        rowCount = 0
-        skills = {}
-        importance = {}
-        for row in reader:
-            if rowCount in leaderList:
-                # change relation name to described documentation
-                relation = "Leader"
-                # if column is skill (based on number beginning the question) assign it to its list. If question starts
-                # with opera... then assign it to importance
-                itemCount = 0
-                previousHeader = None
-                for item in row:
-                    currentHeader = headerList[itemCount]
-                    if currentHeader[:1].isdigit():
-                        try:
-                            currentTotal = int(skills[currentHeader[:2]])
-                            currentTotal += int(item)
-                            skills[currentHeader[:2]] = str(currentTotal)
-                        except:
-                            skills[currentHeader[:2]] = item
-                        previousHeader = currentHeader
-                    elif currentHeader[:2] == "Op":
-                        try:
-                            currentTotal = int(importance[previousHeader[:2]])
-                            currentTotal += int(item)
-                            importance[previousHeader[:2]] = str(currentTotal)
-                        except:
-                            importance[previousHeader[:2]] = item
-                        previousHeader = currentHeader
-                    itemCount += 1
-            rowCount += 1
-        # use number of employees to create averages for each question
-        for key, value in skills.items():
-            currentTotal = int(value) / leaderCount
-            skills[key] = currentTotal
-        for key, value in importance.items():
-            currentTotal = int(value) / leaderCount
-            importance[key] = currentTotal
-        # create Review object for later use 
-        assessments.append(Review(relation, skills, importance))
-    schedule.close()
-
     return assessments
 
 
@@ -341,6 +295,9 @@ def plotData(df):
         background.save('temp.jpg')
         run = row[0].paragraphs[0].add_run()
         run.add_picture('temp.jpg', width=Inches(3))
+        # force page break every two entries
+        if i % 2 == 0:
+            document.add_page_break()
         # save that sweet, sweet memory
         imageFile.close()
         plt.close()

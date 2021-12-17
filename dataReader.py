@@ -193,6 +193,9 @@ def plotData(df, reviewee):
         background.save('temp.jpg')
         run = row[0].paragraphs[0].add_run()
         run.add_picture('temp.jpg', width=Inches(4))
+        # force page break every two entries
+        if i % 2 == 0:
+            document.add_page_break()
         # save that sweet, sweet memory
         imageFile.close()
         plt.close()
