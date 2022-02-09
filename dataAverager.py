@@ -1,3 +1,4 @@
+# import packages
 import csv
 from distutils.log import info
 import sys
@@ -6,8 +7,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import docx
 from docx.shared import Inches
+# import function from helper file
 from parse import *
-
 
 class Review:
     def __init__(self, focusRelation, skillList, importanceList):
@@ -66,15 +67,15 @@ def dataParse():
     schedule.close()
 
     # parse through all employees and add their stats
-    infoArray = parse(scheduleArg, employeeRows, headerList, employeeCount)
+    infoArray = parse.parse(scheduleArg, employeeRows, headerList, employeeCount)
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
 
     # parse through all Self reviews and add their stats
-    infoArray = parse(scheduleArg, selfRows, headerList, selfCount)
+    infoArray = parse.parse(scheduleArg, selfRows, headerList, selfCount)
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
             
     # parse through all boards and add their stats
-    infoArray = parse(scheduleArg, boardRows, headerList, boardCount)
+    infoArray = parse.parse(scheduleArg, boardRows, headerList, boardCount)
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
 
 
