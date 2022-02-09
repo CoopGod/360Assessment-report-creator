@@ -1,11 +1,8 @@
 import csv
 import sys
 import pandas as pd
-import random
-from io import BytesIO
 import matplotlib.pyplot as plt
 from PIL import Image
-import numpy as np
 import docx
 from docx.shared import Inches
 
@@ -16,7 +13,7 @@ class Review:
         self.focusRelation = focusRelation
         self.reviewName = reviewName
         self.skillList = skillList,
-        self.importanceList = importanceList   
+        self.importanceList = importanceList
 
 
 def main():
@@ -60,43 +57,53 @@ def dataParse(reviewee):
             # if person of focus
             if row[3] == reviewee or rowCount == 0:
                 # if not header move through and assign based on documentation
-                if rowCount != 0:
-                    # priliminary setup
-                    name = row[1]
-                    focus = row[3]
-                    # change relation name to described documentation
-                    if row[4] == "Peer" or row[4] == "Employee":
-                        employeeCount += 1
-                        relation = f"Employee {employeeCount}"
-                    else:
-                        relation = row[4]
-                    skills = []
-                    importance = []
-                    # if column is skill (based on number beginning the question) assign it to its list. If question starts
-                    # with opera... then assign it to importance
-                    itemCount = 0
-                    previousHeader = None
-                    for item in row:
-                        currentHeader = headerList[itemCount]
-                        if currentHeader[:1].isdigit():
-                            skills.append(f"{currentHeader[:2]}:{item}")
-                            previousHeader = currentHeader
-                        elif currentHeader[:2] == "Op":
-                            importance.append(f"{previousHeader[:2]}:{item}")
-                        itemCount += 1
-                    # create Review object for later use
-                    assessments.append(Review(focus, relation, name, skills, importance))
-                    rowCount += 1
-                else:
+                headerList = []
+                if rowCount == 0:
                     headerList = row
                     rowCount += 1
+                    break
+                # priliminary setup
+                name = row[1]
+                focus = row[3]
+                # change relation name to described documentation
+                if row[4] == "Peer" or row[4] == "Employee":
+                    employeeCount += 1
+                    relation = f"Employee {employeeCount}"
+                else:
+                    relation = row[4]
+                skills = []
+                importance = []
+                # if column is skill (based on number beginning the question) assign it to its list. If question starts
+                # with opera... then assign it to importance
+                itemCount = 0
+                previousHeader = None
+                for item in row:
+                    currentHeader = headerList[itemCount]
+                    if currentHeader[:1].isdigit():
+                        skills.append(f"{currentHeader[:2]}:{item}")
+                        previousHeader = currentHeader
+                    elif currentHeader[:2] == "Op":
+                        importance.append(f"{previousHeader[:2]}:{item}")
+                    itemCount += 1
+                # create Review object for later use
+                assessments.append(
+                    Review(focus, relation, name, skills, importance))
+                rowCount += 1            
     return assessments
 
 
 # function to create data frame regarding person of focus
 def createDataFrame(assessments):
     # init all columns in data frame
-    df = pd.DataFrame(columns=['1.','2.','3.','4.','5.','6.','7.','8.','9.','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38'])
+    columnList = []
+    for i in range(1, 38):
+        if i < 10:
+            number = f"{i}."
+        else:
+            number = str(i)
+        columnList.append(number)
+    df = pd.DataFrame(columns=columnList)
+    
     # Log all Skill Ratings!
     skillReviewNum = 0
     axisRelations = {}
@@ -126,7 +133,8 @@ def createDataFrame(assessments):
         # add all review data to df
         df = df.append(impValues, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
-        axisRelations[impReviewNum + skillReviewNum] = review.focusRelation + "-IMP"
+        axisRelations[impReviewNum +
+                      skillReviewNum] = review.focusRelation + "-IMP"
         impReviewNum += 1
     # rename and sort alphebetically
     df = df.rename(index=axisRelations)
@@ -137,19 +145,19 @@ def createDataFrame(assessments):
         document = docx.Document('legend.docx')
     except:
         document = docx.Document()
-    document.add_heading(f'{review.focusName}',0)
+    document.add_heading(f'{review.focusName}', 0)
     for review in assessments:
         document.add_paragraph(f"{review.reviewName}: {review.focusRelation}")
     document.save('legend.docx')
-    
+
     return df
-        
+
 
 # function to upload/display graphs using data frame
 def plotData(df, reviewee):
     # get different colors
-    colorDictionary = {0: '#E62421',2: '#344EE3',4: '#34B8E3',6: '#A1FF37',8: '#14CFFF',10: '#3634E3', 12: '#DF46FA', 14: '#E34234', 16: '#FB9F3A'
-    , 18: '#FAF6D1', 20: '#E6AF8C', 22: '#9AC3E6', 24: '#C4B5FA', 26: '#FADA82', 28: '#E6AFAC', 30: '#9EE6DA', 32: '#60E651', 34:'#FA72F7'} # TODO
+    colorDictionary = {0: '#E62421', 2: '#344EE3', 4: '#34B8E3', 6: '#A1FF37', 8: '#14CFFF', 10: '#3634E3', 12: '#DF46FA', 14: '#E34234', 16: '#FB9F3A',
+                       18: '#FAF6D1', 20: '#E6AF8C', 22: '#9AC3E6', 24: '#C4B5FA', 26: '#FADA82', 28: '#E6AFAC', 30: '#9EE6DA', 32: '#60E651', 34: '#FA72F7'}  # TODO
     cmap = []
     bars = len(df.index)
     for num in range(bars):
@@ -160,7 +168,7 @@ def plotData(df, reviewee):
     # save file in report
     # document setup
     document = docx.Document()
-    document.add_heading(f'360 Assessment - {reviewee}',0)
+    document.add_heading(f'360 Assessment - {reviewee}', 0)
     # find complete questions in header of original CSV
     schedule = sys.argv[1]
     with open(schedule, "r", encoding="utf8") as schedule:
@@ -172,13 +180,13 @@ def plotData(df, reviewee):
             headers.append(field)
     # create plot and add image of it to docx
     for i in range(1, len(df.columns) + 1):
-        iteration = str(i) + "." # to skirt the "." issue with 1-9
-        ax = df.plot.bar(y=iteration[:2], color=cmap) # fuck ya
+        iteration = str(i) + "."  # to skirt the "." issue with 1-9
+        ax = df.plot.bar(y=iteration[:2], color=cmap)  # fuck ya
         # pretty graphs <3
         ax.set_ylim(ymax=5.25)
         ax.get_legend().remove()
-        plt.yticks(rotation= 90)
-        plt.yticks([0,1,2,3,4,5], ['I', 'D', 'BA', 'C', 'VG', 'E'])
+        plt.yticks(rotation=90)
+        plt.yticks([0, 1, 2, 3, 4, 5], ['I', 'D', 'BA', 'C', 'VG', 'E'])
         # create table to imitate textbox + add question info/text to document
         table = document.add_table(rows=1, cols=2)
         row = table.rows[0].cells
@@ -187,7 +195,7 @@ def plotData(df, reviewee):
         plt.savefig('temp.jpg', bbox_inches='tight')
         imageFile = Image.open('temp.jpg')
         # add whitespace to image so rotating isn't wonky
-        background = Image.new("RGB", (550, 550), (255,255,255))
+        background = Image.new("RGB", (550, 550), (255, 255, 255))
         background.paste(imageFile)
         background = background.rotate(270)
         background.save('temp.jpg')

@@ -46,7 +46,7 @@ def dataParse():
             if rowCount == 0:
                 headerList = row
                 rowCount += 1
-            
+                break # check this to make sure it works
             # priliminary setup
             name = row[1]
             focus = row[3]
