@@ -1,14 +1,12 @@
 import csv
+from distutils.log import info
 import sys
-from typing import Counter
 import pandas as pd
-import random
-from io import BytesIO
 import matplotlib.pyplot as plt
 from PIL import Image
-import numpy as np
 import docx
 from docx.shared import Inches
+from parse import *
 
 
 class Review:
@@ -36,186 +34,62 @@ def dataParse():
     assessments = []
     with open(scheduleArg, "r", encoding="utf8") as schedule:
         reader = csv.reader(schedule)
-        # Move through rows including header
+        # Move through rows including header        
+        rowCount = employeeCount = selfCount = boardCount = 0
         headerList = []
-        rowCount = 0
         employeeRows = []
-        employeeCount = 0
-        selfCount = 0
         selfRows = []
-        leaderCount = 0
-        leaderList = []
-        boardCount = 0
-        boardList = []
+        boardRows = []
         for row in reader:
-                # if not header move through and assign based on documentation
-                if rowCount != 0:
-                    # priliminary setup
-                    name = row[1]
-                    focus = row[3]
-                    # If employee, bring to different loop and average those scores
-                    if row[4] == "Employee":
-                        employeeCount += 1
-                        relation = "Employee"
-                        employeeRows.append(rowCount)
-                    # else add the rest to their own columns
-                    elif row[4] == "Self":
-                        selfCount += 1
-                        selfRows.append(rowCount)
-                    elif row[4] == "Leader":
-                        leaderCount += 1
-                        leaderList.append(rowCount)
-                    else:
-                        boardCount += 1
-                        boardList.append(rowCount)
-                    rowCount += 1
-                else:
-                    headerList = row
-                    rowCount += 1
+            # if not header move through and assign based on documentation
+            if rowCount == 0:
+                headerList = row
+                rowCount += 1
+            
+            # priliminary setup
+            name = row[1]
+            focus = row[3]
+
+            # If employee, bring to different loop and average those scores
+            if row[4] == "Employee":
+                employeeCount += 1
+                employeeRows.append(rowCount)
+            # else add the rest to their own columns
+            elif row[4] == "Self":
+                selfCount += 1
+                selfRows.append(rowCount)
+            else:
+                boardCount += 1
+                boardRows.append(rowCount)
+            rowCount += 1
+                
     schedule.close()
 
     # parse through all employees and add their stats
-    with open(scheduleArg, "r", encoding="utf8") as schedule:
-        reader = csv.reader(schedule)
-        rowCount = 0
-        skills = {}
-        importance = {}
-        for row in reader:
-            if rowCount in employeeRows:
-                # change relation name to described documentation
-                relation = "Employee"
-                # if column is skill (based on number beginning the question) assign it to its list. If question starts
-                # with opera... then assign it to importance
-                itemCount = 0
-                previousHeader = None
-                for item in row:
-                    currentHeader = headerList[itemCount]
-                    if currentHeader[:1].isdigit():
-                        try:
-                            currentTotal = int(skills[currentHeader[:2]])
-                            currentTotal += int(item)
-                            skills[currentHeader[:2]] = str(currentTotal)
-                        except:
-                            skills[currentHeader[:2]] = item
-                        previousHeader = currentHeader
-                    elif currentHeader[:2] == "Op":
-                        try:
-                            currentTotal = int(importance[previousHeader[:2]])
-                            currentTotal += int(item)
-                            importance[previousHeader[:2]] = str(currentTotal)
-                        except:
-                            importance[previousHeader[:2]] = item
-                        previousHeader = currentHeader
-                    itemCount += 1
-            rowCount += 1
-        # use number of employees to create averages for each question
-        for key, value in skills.items():
-            currentTotal = int(value) / employeeCount
-            skills[key] = currentTotal
-        for key, value in importance.items():
-            currentTotal = int(value) / employeeCount
-            importance[key] = currentTotal
-        # create Review object for later use 
-        assessments.append(Review(relation, skills, importance))
-    schedule.close()
+    infoArray = parse(scheduleArg, employeeRows, headerList, employeeCount)
+    assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
 
     # parse through all Self reviews and add their stats
-    with open(scheduleArg, "r", encoding="utf8") as schedule:
-        reader = csv.reader(schedule)
-        rowCount = 0
-        skills = {}
-        importance = {}
-        for row in reader:
-            if rowCount in selfRows:
-                # change relation name to described documentation
-                relation = "Self"
-                # if column is skill (based on number beginning the question) assign it to its list. If question starts
-                # with opera... then assign it to importance
-                itemCount = 0
-                previousHeader = None
-                for item in row:
-                    currentHeader = headerList[itemCount]
-                    if currentHeader[:1].isdigit():
-                        try:
-                            currentTotal = int(skills[currentHeader[:2]])
-                            currentTotal += int(item)
-                            skills[currentHeader[:2]] = str(currentTotal)
-                        except:
-                            skills[currentHeader[:2]] = item
-                        previousHeader = currentHeader
-                    elif currentHeader[:2] == "Op":
-                        try:
-                            currentTotal = int(importance[previousHeader[:2]])
-                            currentTotal += int(item)
-                            importance[previousHeader[:2]] = str(currentTotal)
-                        except:
-                            importance[previousHeader[:2]] = item
-                        previousHeader = currentHeader
-                    itemCount += 1
-            rowCount += 1
-        # use number of employees to create averages for each question
-        for key, value in skills.items():
-            currentTotal = int(value) / selfCount
-            skills[key] = currentTotal
-        for key, value in importance.items():
-            currentTotal = int(value) / selfCount
-            importance[key] = currentTotal
-        # create Review object for later use 
-        assessments.append(Review(relation, skills, importance))
-    schedule.close()
+    infoArray = parse(scheduleArg, selfRows, headerList, selfCount)
+    assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
             
     # parse through all boards and add their stats
-    with open(scheduleArg, "r", encoding="utf8") as schedule:
-        reader = csv.reader(schedule)
-        rowCount = 0
-        skills = {}
-        importance = {}
-        for row in reader:
-            if rowCount in boardList:
-                # change relation name to described documentation
-                relation = "Board"
-                # if column is skill (based on number beginning the question) assign it to its list. If question starts
-                # with opera... then assign it to importance
-                itemCount = 0
-                previousHeader = None
-                for item in row:
-                    currentHeader = headerList[itemCount]
-                    if currentHeader[:1].isdigit():
-                        try:
-                            currentTotal = int(skills[currentHeader[:2]])
-                            currentTotal += int(item)
-                            skills[currentHeader[:2]] = str(currentTotal)
-                        except:
-                            skills[currentHeader[:2]] = item
-                        previousHeader = currentHeader
-                    elif currentHeader[:2] == "Op":
-                        try:
-                            currentTotal = int(importance[previousHeader[:2]])
-                            currentTotal += int(item)
-                            importance[previousHeader[:2]] = str(currentTotal)
-                        except:
-                            importance[previousHeader[:2]] = item
-                        previousHeader = currentHeader
-                    itemCount += 1
-            rowCount += 1
-        # use number of employees to create averages for each question
-        for key, value in skills.items():
-            currentTotal = int(value) / boardCount
-            skills[key] = currentTotal
-        for key, value in importance.items():
-            currentTotal = int(value) / boardCount
-            importance[key] = currentTotal
-        # create Review object for later use 
-        assessments.append(Review(relation, skills, importance))
-    schedule.close()
-    return assessments
+    infoArray = parse(scheduleArg, boardRows, headerList, boardCount)
+    assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
 
 
 # function to create data frame regarding person of focus
 def createDataFrame(assessments):
     # init all columns in data frame
-    columnList = ['1.','2.','3.','4.','5.','6.','7.','8.','9.','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38']
+    columnList = []
+    for i in range(1, 38):
+        if i < 10:
+            number = f"{i}."
+        else:
+            number = str(i)
+        columnList.append(number)
     df = pd.DataFrame(columns=columnList)
+
     # Log all Skill Ratings!
     skillReviewNum = 0
     axisRelations = {}
@@ -238,6 +112,7 @@ def createDataFrame(assessments):
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
         axisRelations[impReviewNum + skillReviewNum] = review.focusRelation + "-IMP"
         impReviewNum += 1
+
     # rename and sort alphebetically
     df = df.rename(index=axisRelations)
     df = df.sort_index(ascending=False)
