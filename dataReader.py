@@ -57,11 +57,11 @@ def dataParse(reviewee):
             # if person of focus
             if row[3] == reviewee or rowCount == 0:
                 # if not header move through and assign based on documentation
-                headerList = []
                 if rowCount == 0:
+                    headerList = []
                     headerList = row
                     rowCount += 1
-                    break
+                    continue
                 # priliminary setup
                 name = row[1]
                 focus = row[3]
@@ -145,8 +145,8 @@ def createDataFrame(assessments):
         document = docx.Document('legend.docx')
     except:
         document = docx.Document()
-    document.add_heading(f'{review.focusName}', 0)
     for review in assessments:
+        document.add_heading(f'{review.focusName}', 0)
         document.add_paragraph(f"{review.reviewName}: {review.focusRelation}")
     document.save('legend.docx')
 
