@@ -1,7 +1,7 @@
 import csv
 
 # parse through all relations and add their stats
-def parse(scheduleArg, relationRows, headerRows, relationCount):
+def parse(scheduleArg, relationRows, headerRows, relationCount, relation):
     with open(scheduleArg, "r", encoding="utf8") as schedule:
         reader = csv.reader(schedule)
         rowCount = 0
@@ -10,7 +10,6 @@ def parse(scheduleArg, relationRows, headerRows, relationCount):
         for row in reader:
             if rowCount in relationRows:
                 # change relation name to described documentation
-                relation = "Employee"
                 # if column is skill (based on number beginning the question) assign it to its list. If question starts
                 # with opera... then assign it to importance
                 itemCount = 0

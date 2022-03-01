@@ -46,7 +46,7 @@ def dataParse():
             if rowCount == 0:
                 headerList = row
                 rowCount += 1
-                break # check this to make sure it works
+                continue # check this to make sure it works
             # priliminary setup
             name = row[1]
             focus = row[3]
@@ -67,16 +67,18 @@ def dataParse():
     schedule.close()
 
     # parse through all employees and add their stats
-    infoArray = parse.parse(scheduleArg, employeeRows, headerList, employeeCount)
+    infoArray = parse(scheduleArg, employeeRows, headerList, employeeCount, 'Employee')
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
 
     # parse through all Self reviews and add their stats
-    infoArray = parse.parse(scheduleArg, selfRows, headerList, selfCount)
+    infoArray = parse(scheduleArg, selfRows, headerList, selfCount, 'Self')
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
             
     # parse through all boards and add their stats
-    infoArray = parse.parse(scheduleArg, boardRows, headerList, boardCount)
+    infoArray = parse(scheduleArg, boardRows, headerList, boardCount, 'Board')
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
+
+    return assessments
 
 
 # function to create data frame regarding person of focus
