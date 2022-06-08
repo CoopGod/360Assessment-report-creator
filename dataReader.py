@@ -157,15 +157,17 @@ def createDataFrame(assessments):
 def plotData(df, reviewee):
     # get different colors
     colorDictionary = {0: '#E62421', 2: '#344EE3', 4: '#34B8E3', 6: '#A1FF37', 8: '#14CFFF', 10: '#3634E3', 12: '#DF46FA', 14: '#E34234', 16: '#FB9F3A',
-                       18: '#FAF6D1', 20: '#E6AF8C', 22: '#9AC3E6', 24: '#C4B5FA', 26: '#FADA82', 28: '#E6AFAC', 30: '#9EE6DA', 32: '#60E651', 34: '#FA72F7'}  # TODO
+                       18: '#FAF6D1', 20: '#E6AF8C', 22: '#9AC3E6', 24: '#C4B5FA', 26: '#FADA82', 28: '#E6AFAC', 30: '#9EE6DA', 32: '#60E651', 34: '#FA72F7'}
     cmap = []
     bars = len(df.index)
     for num in range(bars):
+        if num > 34:
+            print("ERROR: Exceeds Limit")
+            return 0
         if num % 2 != 0:
             cmap.append(cmap[num - 1])
         else:
             cmap.append(colorDictionary[num])
-    # save file in report
     # document setup
     document = docx.Document()
     document.add_heading(f'360 Assessment - {reviewee}', 0)
