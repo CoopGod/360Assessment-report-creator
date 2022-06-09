@@ -156,7 +156,7 @@ def createDataFrame(assessments):
 # function to upload/display graphs using data frame
 def plotData(df, reviewee):
     # get different colors
-    colorDictionary = {0: '#E62421', 2: '#344EE3', 4: '#34B8E3', 6: '#A1FF37', 8: '#14CFFF', 10: '#3634E3', 12: '#DF46FA', 14: '#E34234', 16: '#FB9F3A',
+    colorDictionary = {0: '#E62421', 2: '#344EE3', 4: '#A1FF37', 6: '#FF69B4', 8: '#FFA500', 10: '#00FF00', 12: '#DF46FA', 14: '#E34234', 16: '#FB9F3A',
                        18: '#FAF6D1', 20: '#E6AF8C', 22: '#9AC3E6', 24: '#C4B5FA', 26: '#FADA82', 28: '#E6AFAC', 30: '#9EE6DA', 32: '#60E651', 34: '#FA72F7'}
     cmap = []
     bars = len(df.index)
@@ -204,7 +204,7 @@ def plotData(df, reviewee):
         run = row[0].paragraphs[0].add_run()
         run.add_picture('temp.jpg', width=Inches(4))
         # force page break every two entries
-        if i % 2 == 0:
+        if i % 2 != 0:
             document.add_page_break()
         # save that sweet, sweet memory
         imageFile.close()
