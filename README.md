@@ -10,6 +10,7 @@ The data frame is then utilized by the *plotData* function, to both plot the dat
 
 The **dataAverager.py** has a very similar structure, however it combines all relations and all people of focus into one graph. Typically for HR to look at trends and significant outliers. It also comes with a CSV file for the clarification of specific numbers.
 ### Example Graph
-![temp](https://user-images.githubusercontent.com/57197353/141396685-33279d9a-a76d-4720-9b47-c6892ee5219b.jpg)
+![temp](https://user-images.githubusercontent.com/57197353/172941624-5b16d8ff-580e-45a1-9215-fa2d8d6f49e7.jpg)
 
-for full reports, please check out the 'example reports' folder! It contains reports for ~~Individuals and a coresponding legend, as well as~~ an overall graph that combines all answers based on the interviewee's role!
+
+for full reports, please check out the 'example reports' folder! It contains an example report for an individual and a coresponding legend, as well as an overall graph that combines all answers based on the interviewee's role!
