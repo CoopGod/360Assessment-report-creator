@@ -1,6 +1,5 @@
 # import packages
 import csv
-from distutils.log import info
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,6 +7,7 @@ from PIL import Image
 import docx
 from docx.shared import Inches
 # import function from helper file
+from numpy import info
 from parse import *
 
 class Review:
@@ -36,11 +36,12 @@ def dataParse():
     with open(scheduleArg, "r", encoding="utf8") as schedule:
         reader = csv.reader(schedule)
         # Move through rows including header        
-        rowCount = employeeCount = selfCount = boardCount = 0
+        rowCount = employeeCount = selfCount = boardCount = peerCount = 0
         headerList = []
         employeeRows = []
         selfRows = []
         boardRows = []
+        peerRows = []
         for row in reader:
             # if not header move through and assign based on documentation
             if rowCount == 0:
@@ -59,6 +60,9 @@ def dataParse():
             elif row[4] == "Self":
                 selfCount += 1
                 selfRows.append(rowCount)
+            elif row[4] == "Peer":
+                peerCount += 1
+                peerRows.append(rowCount)
             else:
                 boardCount += 1
                 boardRows.append(rowCount)
@@ -72,6 +76,11 @@ def dataParse():
 
     # parse through all Self reviews and add their stats
     infoArray = parse(scheduleArg, selfRows, headerList, selfCount, 'Self')
+    assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
+    print(infoArray[0])
+
+    # parse through all Peer reviews and add their stats
+    infoArray = parse(scheduleArg, peerRows, headerList, peerCount, 'Peer')
     assessments.append(Review(infoArray[0], infoArray[1], infoArray[2]))
             
     # parse through all boards and add their stats
@@ -100,7 +109,7 @@ def createDataFrame(assessments):
         skillValues = review.skillList
         # add all review data to df
         temp = pd.DataFrame(skillValues, columns=columnList)
-        df = df.append(temp, ignore_index=True)
+        df = df._append(temp, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
         axisRelations[skillReviewNum] = review.focusRelation + "-SKL"
         skillReviewNum += 1
@@ -111,7 +120,7 @@ def createDataFrame(assessments):
         impValues = review.importanceList
         # add all review data to df
         temp = pd.DataFrame([impValues], columns=columnList)
-        df = df.append(temp, ignore_index=True)
+        df = df._append(temp, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
         axisRelations[impReviewNum + skillReviewNum] = review.focusRelation + "-IMP"
         impReviewNum += 1
