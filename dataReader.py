@@ -116,7 +116,7 @@ def createDataFrame(assessments):
                 header = str(skill[:2])
                 skillValues[header] = data
         # add all review data to df
-        df = df.append(skillValues, ignore_index=True)
+        df = df._append(skillValues, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
         axisRelations[skillReviewNum] = review.focusRelation + "-SKL"
         skillReviewNum += 1
@@ -131,7 +131,7 @@ def createDataFrame(assessments):
             header = str(imps[:2])
             impValues[header] = data
         # add all review data to df
-        df = df.append(impValues, ignore_index=True)
+        df = df._append(impValues, ignore_index=True)
         # change axis names to reviewers relationship and indicate which they are rating (skill vs importance)
         axisRelations[impReviewNum +
                       skillReviewNum] = review.focusRelation + "-IMP"
@@ -202,7 +202,7 @@ def plotData(df, reviewee):
         background = background.rotate(270)
         background.save('temp.jpg')
         run = row[0].paragraphs[0].add_run()
-        run.add_picture('temp.jpg', width=Inches(4))
+        run.add_picture('temp.jpg', width=Inches(2.5))
         # force page break every two entries
         if i % 2 != 0:
             document.add_page_break()

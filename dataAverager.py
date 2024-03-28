@@ -7,7 +7,6 @@ from PIL import Image
 import docx
 from docx.shared import Inches
 # import function from helper file
-from numpy import info
 from parse import *
 
 class Review:
